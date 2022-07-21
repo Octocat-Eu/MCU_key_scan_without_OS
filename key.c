@@ -99,10 +99,10 @@ uint8_t pKeyQueueTail = 0;
 //读取按键值：由主循环调用。从按键缓存中读取按键值，无键则返回0
 keyEvent_t read_a_key_event(void) {
   static uint8_t pKeyQueueHead = 0;//读键指针
-  if (pKeyQueueHead == KEYBUFFSIZE)
-    pKeyQueueHead = 0;//按键缓冲区循环使用
   if (pKeyQueueHead == pKeyQueueTail)
     return 0;//键已经取尽，返回0
+  if (pKeyQueueHead >= KEYBUFFSIZE)
+    pKeyQueueHead = 0;//按键缓冲区循环使用
   return keyQueue[pKeyQueueHead++];
 }
 
@@ -164,7 +164,7 @@ void key_period(void) {
   keyEvent = get_keys_event(keyStableTemp, keyTime);//从键预处理程序中读键值
   if (keyEvent) {//如果有新的键值
     keyQueue[pKeyQueueTail++] = keyEvent;//存入按键缓冲区(pKeyQueueTail永远指向下一空位置)
-    if (pKeyQueueTail == KEYBUFFSIZE)
+    if (pKeyQueueTail >= KEYBUFFSIZE)
       pKeyQueueTail = 0;//按键缓冲区循环使用
   }
 
